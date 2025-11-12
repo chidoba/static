@@ -1,0 +1,235 @@
+swagger: "2.0"
+info:
+  description: "This is the api description for the chidoba configuration api. This api allows you to receive a configuration file that lists all available stores and products for the app."
+  version: "0.2.0"
+  title: "Chidoba Configuration API"
+  termsOfService: "https://chidoba.com/datenschutzerklaerung.html"
+  contact:
+    email: "lvinci@outlook.de"
+host: "gate.chidobanet.com"
+basePath: "/"
+tags:
+- name: "config"
+  description: "Configuration endpoints"
+schemes:
+- "https"
+paths:
+  /config.json:
+    get:
+      tags:
+      - "config"
+      summary: "get the config"
+      description: "Receive the json configuration file"
+      produces:
+      - "application/json"
+      responses:
+        '200':
+          description: The config was returned successfully
+          schema:
+            $ref: "#/definitions/Config"
+definitions:
+  Config:
+    type: "object"
+    description: "The config object that contains all available config data"
+    properties:
+      minimum_supported_build:
+        type: "integer"
+        description: "The minimum supported build number of the chidoba app"
+      error_message:
+        type: "string"
+        description: "Error message that should be displayed on startup if not empty"
+      stores:
+        type: "array"
+        description: "All available stores for the order app"
+        items:
+          $ref: '#/definitions/Store'
+      addons:
+        type: "array"
+        description: "All available addons for the products"
+        items:
+          $ref: '#/definitions/Addon'
+      products:
+        type: "array"
+        description: "All available products to order"
+        items:
+          $ref: '#/definitions/Product'
+      categories:
+        type: "array"
+        description: "All categories of the app"
+        items:
+          $ref: '#/definitions/Category'
+  Category:
+    type: "object"
+    description: "A category of products"
+    properties:
+      id:
+        type: "integer"
+        description: "Unique id of this category"
+      name:
+        type: "string"
+        description: "Name of this category"
+      image_url:
+        type: "string"
+        description: "Url to the image of this category"
+  Store:
+    type: "object"
+    description: "Represents a chidoba store"
+    properties:
+      id:
+        type: "integer"
+        description: "Unique id of this store"
+      name:
+        type: "string"
+        description: "Name of this store"
+      image_url:
+        type: "string"
+        description: "Url to the image of this store"
+      pickup_discount_percent:
+        type: "integer"
+        description: "Percent of discount to apply to pickup orders"
+      delivery_minimum_order:
+        type: "integer"
+        description: "Minimum order amount for delivery in cents"
+      delivery_fee:
+        type: "integer"
+        description: "Fee for delivery orders in cents"
+      contact:
+        type: "object"
+        description: "Contact information of this store"
+        $ref: '#/definitions/StoreContactInfo'
+      opening_days:
+        type: "array"
+        description: "List of opening days of this store"
+        items:
+          type: "object"
+          $ref: '#/definitions/StoreOpeningDay'
+      delivery_areas:
+        type: "array"
+        description: "Areas that this store delivers to"
+        items:
+          $ref: '#/definitions/StoreDeliveryArea'
+  StoreOpeningDay:
+    type: "object"
+    description: "Opening hours for a specific day of week"
+    properties:
+      day:
+        type: "integer"
+        description: "day of the week (1 is monday)"
+      start:
+        type: "string"
+        description: "time of day that this store opens"
+      end:
+        type: "string"
+        description: "time of day that this store closes"
+      last_order:
+        type: "string"
+        description: "when the last order is accepted"
+  StoreDeliveryArea:
+    type: "object"
+    properties:
+      zip:
+        type: "integer"
+        description: "Zip code of this delivery area"
+      city:
+        type: "string"
+        description: "City name of this delivery area"
+  StoreContactInfo:
+    type: "object"
+    description: "Contact information for a specific store"
+    properties:
+      phone:
+        type: "string"
+        description: "Phone number of this store"
+      mail_address:
+        type: "string"
+        description: "Mail address of this store"
+      address:
+        type: "string"
+        description: "Street name and number of this store"
+      zip:
+        type: "integer"
+        description: "Zip code of this stores address"
+      city:
+        type: "string"
+        description: "City name of this stores address"
+      latitude:
+        type: "number"
+        format: "double"
+        description: "Latitude component of this stores coordinates"
+      longitude:
+        type: "number"
+        format: "double"
+        description: "Longitude component of this stores coordinates"
+  Product:
+    type: "object"
+    description: "An available product"
+    properties:
+      id: 
+        type: "integer"
+        description: "Unique id of this addon"
+      name:
+        type: "string"
+        description: "The name of this product"
+      category_id:
+        type: "integer"
+        description: "Id of the category that this product is associated with"
+      image_url:
+        type: "string"
+        description: "Url to the image of this product"
+      price:
+        type: "integer"
+        description: "Price of this product for delivery orders in cents"
+      pickup_price:
+        type: "integer"
+        description: "Price of this product for pickup orders in cents"
+      vat:
+        type: "integer"
+        description: "Percent of vat that the prices contain"
+      available_addons:
+        type: "array"
+        description: "List of the available addon names"
+        items:
+          type: "string"
+  Addon:
+    type: "object"
+    description: "Represents a configurable addon of a product"
+    properties:
+      id: 
+        type: "integer"
+        description: "Unique id of this addon"
+      name:
+        type: "string"
+        description: "The name or heading of this addon"
+      text:
+        type: "string"
+        description: "Text or description of this addon"
+      multiple:
+        type: "boolean"
+        description: "Whether multiple options can be selected or not"
+      required:
+        type: "boolean"
+        description: "Whether at least one option has to be selected or not"
+      options:
+        type: "array"
+        description: "List of available options for this addon"
+        items:
+          $ref: '#/definitions/AddonOption'
+  AddonOption:
+    type: "object"
+    description: "An option of an addon"
+    properties:
+      name:
+        type: "string"
+        description: "Name of this option"
+      price:
+        type: "integer"
+        description: "Price of this option for delivery orders in cents"
+      pickup_price:
+        type: "integer"
+        description: "Price of this option for pickup orders in cents"
+      image_url:
+        type: "string"
+        description: "Url to the image of this addon option"
+      default:
+        type: "boolean"
+        description: "Whether this addon option is selected by default or not"
